@@ -15,7 +15,7 @@ namespace Person.WinConsole
                 Console.WriteLine("Please enter file path: "); // Prompt
                 string path = Console.ReadLine(); // Get path from user
                 //Sort the string and add the person record
-                //Tools.AddPerson(path);
+                Tools.AddPerson(path);
                 //Print the Person Record
                 Tools.PrintPersonAsync();
 
