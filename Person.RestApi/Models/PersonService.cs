@@ -10,6 +10,7 @@ namespace Person.RestApi.Models
 {
     public static class PersonService
     {
+        //Convert to DateTime
         public static DateTime ToDate(this string date)
         {
             DateTime value;
@@ -25,6 +26,7 @@ namespace Person.RestApi.Models
             return value;
         }
 
+        //split the string by delimeter and create person object
         public static PersonRecord CreatePersonFromString(string value)
         {
             PersonRecord per;
@@ -42,22 +44,23 @@ namespace Person.RestApi.Models
             };
 
         }
+        //Add the person async
         public async static Task AddPersonAsync(string value)
         {
             var per = CreatePersonFromString(value);
             using (var db = new PersonRecordContext())
             {
-                db.Persons.Add(per);
+                db.PersonRecords.Add(per);
                 await db.SaveChangesAsync();
             }
         }
 
-
+        //get the person async
         public async static Task<List<PersonRecord>> GetPersonsAsync()
         {
             using (var db = new PersonRecordContext())
             {
-                return await db.Persons.ToListAsync();
+                return await db.PersonRecords.ToListAsync();
             }
         }
 

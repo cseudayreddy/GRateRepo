@@ -2,6 +2,8 @@
 using Person.RestApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +13,12 @@ namespace Person.RestApi.Tests.ServiceTests
     [TestClass]
     public class PersonServiceTests
     {
+        public PersonServiceTests()
+        {
+            var dataDirectory = ConfigurationManager.AppSettings["DataDirectory"];
+            var absoluteDataDirectory = Path.GetFullPath(dataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", absoluteDataDirectory);
+        }
         [TestMethod, TestCategory("Functional Positive- PersonService")]
         public async Task add_new_person_using_personservice()
         {

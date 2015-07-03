@@ -1,5 +1,4 @@
-﻿using Person.RestApi.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -10,38 +9,54 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
-
+using Person.RestApi.Models;
 
 namespace Person.RestApi.Controllers
 {
-    [RoutePrefix("records")]
+     [RoutePrefix("records")]
     public class RecordsController : ApiController
     {
         private PersonRecordContext db = new PersonRecordContext();
+        [Route("", Name = "GetIndividualRecord")]
+        public async Task<PersonRecord> GetPersonAsync(int id)
+        {
+            var model = await db.PersonRecords.FirstOrDefaultAsync(p => p.Id == id);
+            return model;
+        }
+
 
         [Route("gender")]
         //GET: records/gender 
-        public async Task<List<PersonRecord>> GetPersonsGenderAsync()
+        public async Task<List<Record>> GetPersonsGenderAsync()
         {
-            var model = await db.Persons.OrderBy(p=>p.Gender).ThenBy(p=>p.LastName).ToListAsync();
-            return model;
+            var model = await db.PersonRecords.OrderBy(p => p.Gender).ThenBy(p => p.LastName).ToListAsync();
+            return model.Select(p => new Record { LastName = p.LastName, FirstName = p.FirstName, FavoriteColor = p.FavoriteColor, Gender = p.Gender, DateOfBirth = p.DOB.ToString("MM/dd/yyyy") }).ToList();
+
         }
         [Route("birthdate")]
         //GET: records/birthdate 
-        public async Task<List<PersonRecord>> GetPersonsDOBAsync()
+        public async Task<List<Record>> GetPersonsDOBAsync()
         {
-            var model = await db.Persons.OrderBy(p => p.DOB).ToListAsync();
-            return model;
+            var model = await db.PersonRecords.OrderBy(p => p.DOB).ToListAsync();
+            return model.Select(p => new Record { LastName = p.LastName, FirstName = p.FirstName, FavoriteColor = p.FavoriteColor, Gender = p.Gender, DateOfBirth = p.DOB.ToString("MM/dd/yyyy") }).ToList();
         }
-        [Route("name"), ActionName("RecordsByName")]
+        [Route("name")]
         //GET: records/name  
-        public async Task<List<PersonRecord>> GetPersonsLastNameAsync()
+        public async Task<List<Record>> GetPersonsLastNameAsync()
         {
-            var model = await db.Persons.OrderByDescending(p => p.LastName).ToListAsync();
-            return model;
+            var model = await db.PersonRecords.OrderByDescending(p => p.LastName).ToListAsync();
+            return model.Select(p =>
+                new Record
+                {
+                    LastName = p.LastName,
+                    FirstName = p.FirstName,
+                    FavoriteColor = p.FavoriteColor,
+                    Gender = p.Gender,
+                    DateOfBirth = p.DOB.ToString("MM/dd/yyyy")
+                }).ToList();
         }
 
-        // POST: api/Records
+        // POST: Records
         [HttpPost]
         [Route("")]
         [ResponseType(typeof(PersonRecord))]
@@ -52,16 +67,16 @@ namespace Person.RestApi.Controllers
                 return BadRequest(ModelState);
             }
             var person = PersonService.CreatePersonFromString(value);
-            db.Persons.Add(person);
+            db.PersonRecords.Add(person);
             await db.SaveChangesAsync();
 
-            var response = Request.CreateResponse(HttpStatusCode.Created);
 
-            // Generate a link to the new book and set the Location header in the response
-            return CreatedAtRoute("RecordsByName", new { id = person.Id }, person);
+
+            // Generate a link to the new person record
+            return CreatedAtRoute("GetIndividualRecord", new { id = person.Id }, person);
         }
 
-       
+        
 
         protected override void Dispose(bool disposing)
         {
@@ -72,9 +87,9 @@ namespace Person.RestApi.Controllers
             base.Dispose(disposing);
         }
 
-        private bool PersonExists(int id)
+        private bool PersonRecordExists(int id)
         {
-            return db.Persons.Count(e => e.Id == id) > 0;
+            return db.PersonRecords.Count(e => e.Id == id) > 0;
         }
     }
 }

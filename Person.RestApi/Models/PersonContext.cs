@@ -13,8 +13,8 @@ namespace Person.RestApi.Models
         public PersonRecordContext()
             : base("DefaultConnection")
         {
-            Database.SetInitializer<PersonRecordContext>(new CreateDatabaseIfNotExists<PersonRecordContext>());
+            
         }
-        public DbSet<PersonRecord> Persons { get; set; }
+        public DbSet<PersonRecord> PersonRecords { get; set; }
     }
 }
